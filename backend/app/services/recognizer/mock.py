@@ -19,6 +19,7 @@ class MockRecognizer(RecognizerAdapter):
         ]
 
     def recognize(self, image_bytes: bytes, content_type: str) -> str:
-        h = hashlib.sha1(image_bytes).digest()
-        idx = int.from_bytes(h[:2], "big") % len(self._candidates)
+        h = hashlib.sha256(image_bytes).digest()
+        seed = int.from_bytes(h[:8], "big") ^ int.from_bytes(h[8:16], "big") ^ len(image_bytes)
+        idx = seed % len(self._candidates)
         return self._candidates[idx]
